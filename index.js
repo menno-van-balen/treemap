@@ -8,10 +8,36 @@ let width = 1000 - margin.left - margin.right;
 let height = 800 - margin.top - margin.bottom;
 let treemapPadding = 2;
 
-// define color scale
-const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-console.log(color);
+// define colorscale
+const color = d3
+  .scaleOrdinal()
+  .range([
+    "#ffb41a",
+    "#5f3de8",
+    "#73de48",
+    "#6a00c0",
+    "#b1c700",
+    "#aa00b7",
+    "#00b960",
+    "#d900bd",
+    "#008f67",
+    "#ff54c9",
+    "#009dad",
+    "#e25c00",
+    "#017ff2",
+    "#840e00",
+    "#a378ff",
+    "#7b4500",
+    "#003d8e",
+    "#f6b99b",
+    "#800086",
+    "#e3badd",
+    "#332123",
+    "#ffa7fe",
+    "#003e65",
+    "#ff7cad",
+    "#5d0031",
+  ]);
 
 // append svg object to the body of the page
 const svgTreemap = d3
@@ -32,8 +58,6 @@ function createMap(data, error) {
   const root = d3.hierarchy(data).sum(function (d) {
     return d.value;
   }); // size of each leave is given in the 'value' field in input data
-
-  console.log(root);
 
   // d3.treemap computes the position of each element of the hierarchy and calls it
   d3.treemap().size([width, height]).padding(treemapPadding)(root);
@@ -65,5 +89,4 @@ function createMap(data, error) {
     .attr("data-category", (d) => d.data.category)
     .attr("data-name", (d) => d.data.name)
     .attr("data-value", (d) => d.data.value);
-  // .style("fill", "slateblue");
 }
