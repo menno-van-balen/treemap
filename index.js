@@ -43,10 +43,10 @@ const color = d3
 const svgTreemap = d3
   .select(".map-container")
   .append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  .attr("width", width)
+  .attr("height", height);
+// .append("g")
+// .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // fetch json data
 d3.json(kickStarterUrl).then(createMap);
@@ -63,30 +63,87 @@ function createMap(data, error) {
   d3.treemap().size([width, height]).padding(treemapPadding)(root);
 
   // define the leaves
-  const leaf = svgTreemap.selectAll("rect").data(root.leaves()).enter();
-  console.log(leaf);
+  const leaf = svgTreemap
+    .selectAll("g")
+    .data(root.leaves())
+    .enter()
+    .append("g")
+    .attr("transform", function (d) {
+      return "translate(" + d.x0 + "," + d.y0 + ")";
+    });
+
   // create the leaves
   leaf
     .append("rect")
-    .attr("x", function (d) {
-      return d.x0;
-    })
-    .attr("y", function (d) {
-      return d.y0;
-    })
     .attr("width", function (d) {
       return d.x1 - d.x0;
     })
     .attr("height", function (d) {
       return d.y1 - d.y0;
     })
-    .style("stroke", "black")
+    // .style("stroke", "black")
     .attr("fill", (d) => {
-      while (d.depth > 1) d = d.parent;
-      return color(d.data.name);
+      return color(d.data.category);
     })
     .attr("class", "tile")
     .attr("data-category", (d) => d.data.category)
     .attr("data-name", (d) => d.data.name)
     .attr("data-value", (d) => d.data.value);
+
+  leaf
+    .append("text")
+    .attr("x", 5)
+    .attr("y", 12)
+    .text((d) => {
+      return d.data.name;
+    })
+    .attr("width", function (d) {
+      return parseInt(d.x1 - d.x0);
+    })
+    .attr("hight", function (d) {
+      return parseInt(d.y1 - d.y0);
+    })
+    .call(wrap);
+
+  function wrap(text) {
+    text.each(function () {
+      let text = d3.select(this),
+        width = text.attr("width") - 5,
+        hight = text.attr("hight"),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        x = text.attr("x"),
+        dy = text.attr("y"),
+        tHight = dy,
+        tspan = text.text(null).append("tspan");
+      // tspan.style("font-size", 12);
+
+      // console.log(width);
+
+      while ((word = words.pop())) {
+        line.push(word);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > width) {
+          // if (tHight < hight - dy) break;
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [word];
+          tspan = text.append("tspan").attr("x", x).attr("dy", dy).text(word);
+          tHight = tHight + dy;
+          if (tspan.node().getComputedTextLength() > width) {
+            tspan.style(
+              "font-size",
+              (width / tspan.node().getComputedTextLength()) * 10
+            );
+          }
+        }
+        // console.log(this.getComputedTextLength());
+      }
+      // tspan.each(function () {
+      //   console.log(width);
+      //   tspan.style("font-size", (width / this.getComputedTextLength()) * 5);
+      // });
+    });
+  }
 }
