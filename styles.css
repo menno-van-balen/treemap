@@ -16,3 +16,13 @@ tspan {
   fill: white;
   font-size: 13px;
 }
+
+#tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 5px;
+  font: 14px sans-serif;
+  background: rgb(255, 241, 181);
+  border: 0px;
+  border-radius: 8px;
+}

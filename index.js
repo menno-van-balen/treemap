@@ -39,6 +39,13 @@ const color = d3
     "#5d0031",
   ]);
 
+// define div for tooltip
+const tooltip = d3
+  .select("body")
+  .append("div")
+  .attr("id", "tooltip")
+  .style("opacity", 0);
+
 // append svg object to the body of the page
 const svgTreemap = d3
   .select(".map-container")
@@ -68,6 +75,30 @@ function createMap(data, error) {
     .append("g")
     .attr("transform", function (d) {
       return "translate(" + d.x0 + "," + d.y0 + ")";
+    })
+    .on("mousemove", function (d, i) {
+      let mouseX = event.clientX;
+      let mouseY = event.clientY;
+      tooltip.transition().duration(500).style("opacity", 0.9);
+      tooltip.attr("data-value", i.data.value);
+      tooltip
+        .html(
+          "Category: " +
+            i.data.category +
+            "<br>" +
+            "Name: " +
+            i.data.name +
+            "<br>" +
+            "Value: " +
+            i.data.value
+        )
+        .style("top", mouseY + 10 + "px")
+        .style("left", mouseX + 10 + "px");
+      // .style("top", mouse[1] + 10 + "px")
+      // .style("left", mouse[0] + 10 + "px");
+    })
+    .on("mouseout", function (d) {
+      tooltip.transition().duration(200).style("opacity", 0);
     });
 
   // create the leaves
@@ -87,6 +118,27 @@ function createMap(data, error) {
     .attr("data-category", (d) => d.data.category)
     .attr("data-name", (d) => d.data.name)
     .attr("data-value", (d) => d.data.value);
+  // .on("mousemove", function (d, i) {
+  //   tooltip.transition().duration(200).style("opacity", 0.75);
+  //   tooltip.attr("data-value", d3.select(this).attr("data-value"));
+  //   tooltip.attr("this", console.log(i.data));
+  //   tooltip
+  //     .html(
+  //       "Name: " +
+  //         i.data.name +
+  //         "<br>" +
+  //         "Category: " +
+  //         i.data.category +
+  //         "<br>" +
+  //         "Value: " +
+  //         i.data.value
+  //     )
+  //     .style("top", d3.event.pageY - 95 + "px")
+  //     .style("left", d3.event.pageX + "px");
+  // })
+  // .on("mouseout", function (d) {
+  //   tooltip.transition().duration(200).style("opacity", 0);
+  // });
 
   // append text with callback function
   leave
