@@ -4,8 +4,8 @@ const kickStarterUrl =
 
 // set dimensions and margins of the graph and treemap padding
 let margin = { top: 10, right: 10, bottom: 10, left: 10 };
-let width = 1000 - margin.left - margin.right;
-let height = 800 - margin.top - margin.bottom;
+let width = 1000;
+let height = 800;
 let treemapPadding = 2;
 
 // define colorscale
@@ -45,8 +45,6 @@ const svgTreemap = d3
   .append("svg")
   .attr("width", width)
   .attr("height", height);
-// .append("g")
-// .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // fetch json data
 d3.json(kickStarterUrl).then(createMap);
@@ -63,7 +61,7 @@ function createMap(data, error) {
   d3.treemap().size([width, height]).padding(treemapPadding)(root);
 
   // define the leaves
-  const leaf = svgTreemap
+  const leave = svgTreemap
     .selectAll("g")
     .data(root.leaves())
     .enter()
@@ -73,7 +71,7 @@ function createMap(data, error) {
     });
 
   // create the leaves
-  leaf
+  leave
     .append("rect")
     .attr("width", function (d) {
       return d.x1 - d.x0;
@@ -81,7 +79,7 @@ function createMap(data, error) {
     .attr("height", function (d) {
       return d.y1 - d.y0;
     })
-    // .style("stroke", "black")
+    .style("stroke", "black")
     .attr("fill", (d) => {
       return color(d.data.category);
     })
@@ -90,7 +88,8 @@ function createMap(data, error) {
     .attr("data-name", (d) => d.data.name)
     .attr("data-value", (d) => d.data.value);
 
-  leaf
+  // append text with callback function
+  leave
     .append("text")
     .attr("x", 5)
     .attr("y", 12)
@@ -103,47 +102,42 @@ function createMap(data, error) {
     .attr("hight", function (d) {
       return parseInt(d.y1 - d.y0);
     })
-    .call(wrap);
+    .call(wrapText);
 
-  function wrap(text) {
+  // function to wrap horizontal and veritcal within the leaves
+  // works best when font-size is set in css!
+  function wrapText(text) {
     text.each(function () {
-      let text = d3.select(this),
-        width = text.attr("width") - 5,
-        hight = text.attr("hight"),
-        words = text.text().split(/\s+/).reverse(),
-        word,
-        line = [],
-        x = text.attr("x"),
-        dy = text.attr("y"),
-        tHight = dy,
-        tspan = text.text(null).append("tspan");
-      // tspan.style("font-size", 12);
-
-      // console.log(width);
+      let text = d3.select(this);
+      let width = text.attr("width") - 7; // a bit extra padding
+      let hight = text.attr("hight") - 2;
+      let words = text.text().split(/\s+/).reverse();
+      let word = null;
+      let line = [];
+      let x = text.attr("x");
+      let dy = text.attr("y");
+      let tHight = +dy;
+      let tspan = text.text(null).append("tspan");
 
       while ((word = words.pop())) {
         line.push(word);
         tspan.text(line.join(" "));
+
         if (tspan.node().getComputedTextLength() > width) {
-          // if (tHight < hight - dy) break;
           line.pop();
           tspan.text(line.join(" "));
           line = [word];
           tspan = text.append("tspan").attr("x", x).attr("dy", dy).text(word);
-          tHight = tHight + dy;
+          tHight = tHight + +dy;
           if (tspan.node().getComputedTextLength() > width) {
             tspan.style(
               "font-size",
-              (width / tspan.node().getComputedTextLength()) * 10
+              (width / tspan.node().getComputedTextLength()) * 12
             );
           }
+          if (tHight > hight - dy) return;
         }
-        // console.log(this.getComputedTextLength());
       }
-      // tspan.each(function () {
-      //   console.log(width);
-      //   tspan.style("font-size", (width / this.getComputedTextLength()) * 5);
-      // });
     });
   }
 }
