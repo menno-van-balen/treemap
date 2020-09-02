@@ -17,6 +17,10 @@ tspan {
   font-size: 13px;
 }
 
+.legend-container {
+  display: flex;
+}
+
 #tooltip {
   position: absolute;
   text-align: center;
@@ -25,4 +29,8 @@ tspan {
   background: rgb(255, 241, 181);
   border: 0px;
   border-radius: 8px;
+}
+
+g:hover {
+  cursor: pointer;
 }

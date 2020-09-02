@@ -8,6 +8,12 @@ let width = 1000;
 let height = 800;
 let treemapPadding = 2;
 
+// set dimensions and margins of legend
+let leggendwidth = 1000;
+let leggendHeight = 500;
+let size = 20;
+let leggendPadding = size / 2;
+
 // define colorscale
 const color = d3
   .scaleOrdinal()
@@ -46,7 +52,14 @@ const tooltip = d3
   .attr("id", "tooltip")
   .style("opacity", 0);
 
-// append svg object to the body of the page
+// append svg for legend to body of page
+const svgLegend = d3
+  .select(".legend-container")
+  .append("svg")
+  .attr("width", leggendwidth)
+  .attr("height", leggendHeight);
+
+// append svg for treemap to body of page
 const svgTreemap = d3
   .select(".map-container")
   .append("svg")
@@ -58,6 +71,38 @@ d3.json(kickStarterUrl).then(createMap);
 
 function createMap(data, error) {
   if (error) console.error();
+  console.log(data.children);
+
+  // legend
+  const legendRect = svgLegend
+    .selectAll("rect")
+    .data(data.children)
+    .enter()
+    .append("rect")
+    .attr("class", "legend-item")
+    .attr("fill", function (d, i) {
+      return color(d.name);
+    })
+    .attr("x", leggendPadding)
+    .attr("y", (d, i) => i * (size + 5))
+    .attr("width", size)
+    .attr("height", size)
+    .attr("this", function (d, i) {
+      console.log(d.name);
+    });
+
+  svgLegend
+    .selectAll("text")
+    .data(data.children)
+    .enter()
+    .append("text")
+    .text(function (d) {
+      return d.name;
+    })
+    .attr("x", leggendPadding + size * 1.2)
+    .attr("y", (d, i) => i * (size + 5) + size / 2)
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle");
 
   // give data to this cluster layout:
   const root = d3.hierarchy(data).sum(function (d) {
@@ -92,10 +137,8 @@ function createMap(data, error) {
             "Value: " +
             i.data.value
         )
-        .style("top", mouseY + 10 + "px")
+        .style("top", mouseY - 60 + "px")
         .style("left", mouseX + 10 + "px");
-      // .style("top", mouse[1] + 10 + "px")
-      // .style("left", mouse[0] + 10 + "px");
     })
     .on("mouseout", function (d) {
       tooltip.transition().duration(200).style("opacity", 0);
@@ -118,27 +161,6 @@ function createMap(data, error) {
     .attr("data-category", (d) => d.data.category)
     .attr("data-name", (d) => d.data.name)
     .attr("data-value", (d) => d.data.value);
-  // .on("mousemove", function (d, i) {
-  //   tooltip.transition().duration(200).style("opacity", 0.75);
-  //   tooltip.attr("data-value", d3.select(this).attr("data-value"));
-  //   tooltip.attr("this", console.log(i.data));
-  //   tooltip
-  //     .html(
-  //       "Name: " +
-  //         i.data.name +
-  //         "<br>" +
-  //         "Category: " +
-  //         i.data.category +
-  //         "<br>" +
-  //         "Value: " +
-  //         i.data.value
-  //     )
-  //     .style("top", d3.event.pageY - 95 + "px")
-  //     .style("left", d3.event.pageX + "px");
-  // })
-  // .on("mouseout", function (d) {
-  //   tooltip.transition().duration(200).style("opacity", 0);
-  // });
 
   // append text with callback function
   leave
@@ -156,7 +178,7 @@ function createMap(data, error) {
     })
     .call(wrapText);
 
-  // function to wrap horizontal and veritcal within the leaves
+  // function to wrap text horizontal and veritcal within the leaves
   // works best when font-size is set in css!
   function wrapText(text) {
     text.each(function () {
