@@ -140,28 +140,31 @@ function createMap(data, error) {
     .attr("transform", function (d) {
       return "translate(" + d.x0 + "," + d.y0 + ")";
     })
-    .on("mousemove", function (d, i) {
-      let mouseX = event.clientX;
-      let mouseY = event.clientY;
-      tooltip.transition().duration(500).style("opacity", 0.9);
-      tooltip.attr("data-value", i.data.value);
-      tooltip
-        .html(
-          "Category: " +
-            i.data.category +
-            "<br>" +
-            "Name: " +
-            i.data.name +
-            "<br>" +
-            "Value: " +
-            i.data.value
-        )
-        .style("top", mouseY - 60 + "px")
-        .style("left", mouseX + 10 + "px");
-    })
+    .on("mouseover", updateTooltip)
+    .on("mousemove", updateTooltip)
     .on("mouseout", function (d) {
       tooltip.transition().duration(200).style("opacity", 0);
     });
+
+  function updateTooltip(d, i) {
+    let mouseX = event.pageX;
+    let mouseY = event.pageY;
+    tooltip.transition().duration(300).style("opacity", 0.9);
+    tooltip.attr("data-value", i.data.value);
+    tooltip
+      .html(
+        "Category: " +
+          i.data.category +
+          "<br>" +
+          "Name: " +
+          i.data.name +
+          "<br>" +
+          "Value: " +
+          i.data.value
+      )
+      .style("top", mouseY - 60 + "px")
+      .style("left", mouseX + 10 + "px");
+  }
 
   // create the leaves
   leave
