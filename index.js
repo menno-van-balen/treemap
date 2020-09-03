@@ -10,9 +10,9 @@ let treemapPadding = 2;
 
 // set dimensions and margins of legend
 let leggendwidth = 1000;
-let leggendHeight = 500;
+// let leggendHeight = 500;
 let size = 20;
-let leggendPadding = size / 2;
+let leggendPadding = size / 4;
 
 // define colorscale
 const color = d3
@@ -52,13 +52,6 @@ const tooltip = d3
   .attr("id", "tooltip")
   .style("opacity", 0);
 
-// append svg for legend to body of page
-const svgLegend = d3
-  .select(".legend-container")
-  .append("svg")
-  .attr("width", leggendwidth)
-  .attr("height", leggendHeight);
-
 // append svg for treemap to body of page
 const svgTreemap = d3
   .select(".map-container")
@@ -71,38 +64,71 @@ d3.json(kickStarterUrl).then(createMap);
 
 function createMap(data, error) {
   if (error) console.error();
-  console.log(data.children);
+  // console.log(data.children);
 
   // legend
-  const legendRect = svgLegend
-    .selectAll("rect")
+  let rows = 3;
+
+  const itemsPerRow = Math.ceil(data.children.length / rows);
+  const legendHeight = itemsPerRow * (size + leggendPadding);
+  // console.log(Math.ceil(data.children.length / rows));
+
+  // append svg for legend to body of page
+  const svgLegend = d3
+    .select(".legend-container")
+    .append("svg")
+    .attr("id", "legend")
+    .attr("width", width)
+    .attr("height", legendHeight);
+
+  const legend = svgLegend
+    .selectAll("g")
     .data(data.children)
     .enter()
-    .append("rect")
+    .append("g")
     .attr("class", "legend-item")
+    .attr("transform", function (d, i) {
+      console.log(Math.floor(i / itemsPerRow));
+      const y = (i % itemsPerRow) * (size + leggendPadding);
+      const x = () => {
+        if (itemsPerRow / i > 1) {
+          return leggendPadding;
+        }
+        if (1 >= itemsPerRow / i && itemsPerRow / i > 0.5) {
+          return width / rows;
+        }
+        if (itemsPerRow / i <= 0.5) {
+          return (width / rows) * 2;
+        }
+      };
+      return "translate(" + x() + ", " + y + ")";
+    });
+
+  legend
+    .append("rect")
+    .attr("width", size)
+    .attr("height", size)
     .attr("fill", function (d, i) {
       return color(d.name);
     })
-    .attr("x", leggendPadding)
-    .attr("y", (d, i) => i * (size + 5))
-    .attr("width", size)
-    .attr("height", size)
+    // .attr("x", leggendPadding)
+    // .attr("y", (d, i) => i * (size + 5))
     .attr("this", function (d, i) {
-      console.log(d.name);
+      // console.log(d.name);
     });
 
-  svgLegend
-    .selectAll("text")
-    .data(data.children)
-    .enter()
-    .append("text")
-    .text(function (d) {
-      return d.name;
-    })
-    .attr("x", leggendPadding + size * 1.2)
-    .attr("y", (d, i) => i * (size + 5) + size / 2)
-    .attr("text-anchor", "left")
-    .style("alignment-baseline", "middle");
+  // svgLegend
+  //   .selectAll("text")
+  //   .data(data.children)
+  //   .enter()
+  //   .append("text")
+  //   .text(function (d) {
+  //     return d.name;
+  //   })
+  //   .attr("x", leggendPadding + size * 1.2)
+  //   .attr("y", (d, i) => i * (size + 5) + size / 2)
+  //   .attr("text-anchor", "left")
+  //   .style("alignment-baseline", "middle");
 
   // give data to this cluster layout:
   const root = d3.hierarchy(data).sum(function (d) {

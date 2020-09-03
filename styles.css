@@ -17,9 +17,12 @@ tspan {
   font-size: 13px;
 }
 
-.legend-container {
+/* #legend {
   display: flex;
-}
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+} */
 
 #tooltip {
   position: absolute;
