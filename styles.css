@@ -3,11 +3,6 @@ body {
   padding: 0;
 }
 
-/* svg {
-  display: block;
-  margin: auto;
-} */
-
 g {
   margin: 0;
 }
@@ -16,13 +11,6 @@ tspan {
   fill: white;
   font-size: 13px;
 }
-
-/* #legend {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-} */
 
 #tooltip {
   position: absolute;
@@ -34,6 +22,6 @@ tspan {
   border-radius: 8px;
 }
 
-g:hover {
+.leave:hover {
   cursor: pointer;
 }

@@ -19,33 +19,34 @@ const videogameUrl =
   "https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/video-game-sales-data.json";
 
 // define colorscale
-const color = d3.scaleOrdinal().range([
-  "#ffb41a",
-  "#5f3de8",
-  "#73de48",
-  "#6a00c0",
-  "#b1c700",
-  "#aa00b7",
-  "#00b960",
-  "#d900bd",
-  "#008f67",
-  "#ff54c9",
-  "#009dad",
-  "#e25c00",
-  "#017ff2",
-  "#840e00",
-  "#a378ff",
-  "#7b4500",
-  "#003d8e",
-  "#f6b99b",
-  "#800086",
-  // "#e3badd",
-  "#332123",
-  "#ffa7fe",
-  "#003e65",
-  "#ff7cad",
-  "#5d0031",
-]);
+const color = d3
+  .scaleOrdinal()
+  .range([
+    "#ffb41a",
+    "#5f3de8",
+    "#73de48",
+    "#6a00c0",
+    "#b1c700",
+    "#aa00b7",
+    "#00b960",
+    "#d900bd",
+    "#008f67",
+    "#ff54c9",
+    "#009dad",
+    "#e25c00",
+    "#017ff2",
+    "#840e00",
+    "#a378ff",
+    "#7b4500",
+    "#003d8e",
+    "#f6b99b",
+    "#800086",
+    "#332123",
+    "#ffa7fe",
+    "#003e65",
+    "#ff7cad",
+    "#5d0031",
+  ]);
 
 // define div for tooltip
 const tooltip = d3
@@ -54,7 +55,7 @@ const tooltip = d3
   .attr("id", "tooltip")
   .style("opacity", 0);
 
-// fetch json data
+// fetch json data and load content
 function getData(url = kickStarterUrl) {
   d3.json(url).then(createMap);
   if (url == kickStarterUrl) {
@@ -64,13 +65,15 @@ function getData(url = kickStarterUrl) {
       "Top 100 Most Pledged Kickstarter Campaigns Grouped By Category";
   }
   if (url == moviesUrl) {
-    document.getElementById("title").texContent = "Movies Sales";
-    document.getElementById("discription").texContent =
+    console.log("movie");
+    document.getElementById("title").textContent = "Movies Sales";
+    document.getElementById("discription").textContent =
       "Top 100 Highest Grossing Movies Grouped By Genre";
   }
   if (url == videogameUrl) {
-    document.getElementById("title").texContent = "Videogame Sales";
-    document.getElementById("discription").texContent =
+    console.log("videogame");
+    document.getElementById("title").textContent = "Videogame Sales";
+    document.getElementById("discription").textContent =
       "Top 100 Most Sold Video Games Grouped by Platform";
   }
 }
@@ -161,6 +164,7 @@ function createMap(data, error) {
     .data(root.leaves())
     .enter()
     .append("g")
+    .attr("class", "leave")
     .attr("transform", function (d) {
       return "translate(" + d.x0 + "," + d.y0 + ")";
     })
@@ -228,14 +232,14 @@ function createMap(data, error) {
   // works best when font-size is set in css!
   function wrapText(text) {
     text.each(function () {
-      let text = d3.select(this);
-      let width = text.attr("width") - 7; // a bit extra padding
-      let hight = text.attr("hight") - 2;
+      const text = d3.select(this);
+      const width = text.attr("width") - 7; // a bit extra padding
+      const hight = text.attr("hight") - 2;
       let words = text.text().split(/\s+/).reverse();
       let word = null;
       let line = [];
-      let x = text.attr("x");
-      let dy = text.attr("y");
+      const x = text.attr("x");
+      const dy = text.attr("y");
       let tHight = +dy;
       let tspan = text.text(null).append("tspan");
 
@@ -243,17 +247,15 @@ function createMap(data, error) {
         line.push(word);
         tspan.text(line.join(" "));
 
-        if (tspan.node().getComputedTextLength() > width) {
+        const realTspanWidth = tspan.node().getComputedTextLength();
+        if (realTspanWidth > width) {
           line.pop();
           tspan.text(line.join(" "));
           line = [word];
           tspan = text.append("tspan").attr("x", x).attr("dy", dy).text(word);
           tHight = tHight + +dy;
-          if (tspan.node().getComputedTextLength() > width) {
-            tspan.style(
-              "font-size",
-              (width / tspan.node().getComputedTextLength()) * 12
-            );
+          if (realTspanWidth > width) {
+            tspan.style("font-size", (width / realTspanWidth) * 12);
           }
           if (tHight > hight - dy) return;
         }
