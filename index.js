@@ -59,19 +59,16 @@ const tooltip = d3
 function getData(url = kickStarterUrl) {
   d3.json(url).then(createMap);
   if (url == kickStarterUrl) {
-    console.log("kick");
     document.getElementById("title").textContent = "Kickstarter Pledges";
     document.getElementById("discription").textContent =
       "Top 100 Most Pledged Kickstarter Campaigns Grouped By Category";
   }
   if (url == moviesUrl) {
-    console.log("movie");
     document.getElementById("title").textContent = "Movies Sales";
     document.getElementById("discription").textContent =
       "Top 100 Highest Grossing Movies Grouped By Genre";
   }
   if (url == videogameUrl) {
-    console.log("videogame");
     document.getElementById("title").textContent = "Videogame Sales";
     document.getElementById("discription").textContent =
       "Top 100 Most Sold Video Games Grouped by Platform";
@@ -248,6 +245,7 @@ function createMap(data, error) {
         tspan.text(line.join(" "));
 
         const realTspanWidth = tspan.node().getComputedTextLength();
+
         if (realTspanWidth > width) {
           line.pop();
           tspan.text(line.join(" "));
