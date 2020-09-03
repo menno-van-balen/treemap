@@ -1,7 +1,3 @@
-// data
-const kickStarterUrl =
-  "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json";
-
 // set dimensions and margins of the graph and treemap padding
 // let margin = { top: 10, right: 10, bottom: 10, left: 10 };
 let treemapWidth = 1000;
@@ -11,38 +7,45 @@ let treemapPadding = 2;
 // set dimensions and margins of legend
 let legendRows = 7;
 let legendRectSize = 20;
-let leggendPadding = legendRectSize / 4;
+
+// data
+const kickStarterUrl =
+  "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json";
+
+const moviesUrl =
+  "https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/movie-data.json";
+
+const videogameUrl =
+  "https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/video-game-sales-data.json";
 
 // define colorscale
-const color = d3
-  .scaleOrdinal()
-  .range([
-    "#ffb41a",
-    "#5f3de8",
-    "#73de48",
-    "#6a00c0",
-    "#b1c700",
-    "#aa00b7",
-    "#00b960",
-    "#d900bd",
-    "#008f67",
-    "#ff54c9",
-    "#009dad",
-    "#e25c00",
-    "#017ff2",
-    "#840e00",
-    "#a378ff",
-    "#7b4500",
-    "#003d8e",
-    "#f6b99b",
-    "#800086",
-    "#e3badd",
-    "#332123",
-    "#ffa7fe",
-    "#003e65",
-    "#ff7cad",
-    "#5d0031",
-  ]);
+const color = d3.scaleOrdinal().range([
+  "#ffb41a",
+  "#5f3de8",
+  "#73de48",
+  "#6a00c0",
+  "#b1c700",
+  "#aa00b7",
+  "#00b960",
+  "#d900bd",
+  "#008f67",
+  "#ff54c9",
+  "#009dad",
+  "#e25c00",
+  "#017ff2",
+  "#840e00",
+  "#a378ff",
+  "#7b4500",
+  "#003d8e",
+  "#f6b99b",
+  "#800086",
+  // "#e3badd",
+  "#332123",
+  "#ffa7fe",
+  "#003e65",
+  "#ff7cad",
+  "#5d0031",
+]);
 
 // define div for tooltip
 const tooltip = d3
@@ -51,20 +54,34 @@ const tooltip = d3
   .attr("id", "tooltip")
   .style("opacity", 0);
 
-// append svg for treemap to body of page
-const svgTreemap = d3
-  .select(".map-container")
-  .append("svg")
-  .attr("width", treemapWidth)
-  .attr("height", TreemapHeight);
-
 // fetch json data
-d3.json(kickStarterUrl).then(createMap);
+function getData(url = kickStarterUrl) {
+  d3.json(url).then(createMap);
+  if (url == kickStarterUrl) {
+    console.log("kick");
+    document.getElementById("title").textContent = "Kickstarter Pledges";
+    document.getElementById("discription").textContent =
+      "Top 100 Most Pledged Kickstarter Campaigns Grouped By Category";
+  }
+  if (url == moviesUrl) {
+    document.getElementById("title").texContent = "Movies Sales";
+    document.getElementById("discription").texContent =
+      "Top 100 Highest Grossing Movies Grouped By Genre";
+  }
+  if (url == videogameUrl) {
+    document.getElementById("title").texContent = "Videogame Sales";
+    document.getElementById("discription").texContent =
+      "Top 100 Most Sold Video Games Grouped by Platform";
+  }
+}
 
 function createMap(data, error) {
   if (error) console.error();
 
+  d3.selectAll("svg").remove();
+
   // legend
+  const leggendPadding = legendRectSize / 4;
   const itemsPerRow = Math.ceil(data.children.length / legendRows);
   const legendHeight = itemsPerRow * (legendRectSize + leggendPadding);
 
@@ -121,6 +138,13 @@ function createMap(data, error) {
     });
   }
 
+  // append svg for treemap
+  const svgTreemap = d3
+    .select(".map-container")
+    .append("svg")
+    .attr("width", treemapWidth)
+    .attr("height", TreemapHeight);
+
   // give data to this cluster layout:
   const root = d3.hierarchy(data).sum(function (d) {
     return d.value;
@@ -142,13 +166,13 @@ function createMap(data, error) {
     })
     .on("mouseover", updateTooltip)
     .on("mousemove", updateTooltip)
-    .on("mouseout", function (d) {
+    .on("mouseout", function () {
       tooltip.transition().duration(200).style("opacity", 0);
     });
 
   function updateTooltip(d, i) {
-    let mouseX = event.pageX;
-    let mouseY = event.pageY;
+    const mouseX = event.pageX;
+    const mouseY = event.pageY;
     tooltip.transition().duration(300).style("opacity", 0.9);
     tooltip.attr("data-value", i.data.value);
     tooltip
@@ -188,7 +212,7 @@ function createMap(data, error) {
   leave
     .append("text")
     .attr("x", 5)
-    .attr("y", 12)
+    .attr("y", 13)
     .text((d) => {
       return d.data.name;
     })
@@ -237,3 +261,5 @@ function createMap(data, error) {
     });
   }
 }
+
+getData();

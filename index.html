@@ -10,6 +10,22 @@
     <header>
       <h1 id="title"></h1>
       <p id="discription"></p>
+      <div class="navbar">
+        <em>Choose your dataset:</em>
+        <button
+          type="button"
+          id="kickstarter"
+          onclick="getData(kickStarterUrl)"
+        >
+          Kickstarter Data Set
+        </button>
+        <button type="button" id="movies" onclick="getData(moviesUrl)">
+          Movies Data Set
+        </button>
+        <button type="button" id="videogame" onclick="getData(videogameUrl)">
+          Video Game Data Set
+        </button>
+      </div>
     </header>
     <main>
       <div class="legend-container"></div>
