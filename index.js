@@ -3,16 +3,15 @@ const kickStarterUrl =
   "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json";
 
 // set dimensions and margins of the graph and treemap padding
-let margin = { top: 10, right: 10, bottom: 10, left: 10 };
-let width = 1000;
-let height = 800;
+// let margin = { top: 10, right: 10, bottom: 10, left: 10 };
+let treemapWidth = 1000;
+let TreemapHeight = 800;
 let treemapPadding = 2;
 
 // set dimensions and margins of legend
-let leggendwidth = 1000;
-// let leggendHeight = 500;
-let size = 20;
-let leggendPadding = size / 4;
+let legendRows = 7;
+let legendRectSize = 20;
+let leggendPadding = legendRectSize / 4;
 
 // define colorscale
 const color = d3
@@ -56,30 +55,28 @@ const tooltip = d3
 const svgTreemap = d3
   .select(".map-container")
   .append("svg")
-  .attr("width", width)
-  .attr("height", height);
+  .attr("width", treemapWidth)
+  .attr("height", TreemapHeight);
 
 // fetch json data
 d3.json(kickStarterUrl).then(createMap);
 
 function createMap(data, error) {
   if (error) console.error();
-  // console.log(data.children);
 
   // legend
-  let rows = 5;
-
-  const itemsPerRow = Math.ceil(data.children.length / rows);
-  const legendHeight = itemsPerRow * (size + leggendPadding);
+  const itemsPerRow = Math.ceil(data.children.length / legendRows);
+  const legendHeight = itemsPerRow * (legendRectSize + leggendPadding);
 
   // append svg for legend to body of page
   const svgLegend = d3
     .select(".legend-container")
     .append("svg")
     .attr("id", "legend")
-    .attr("width", width)
+    .attr("width", treemapWidth)
     .attr("height", legendHeight);
 
+  // append legend items
   const legend = svgLegend
     .selectAll("g")
     .data(data.children)
@@ -87,15 +84,17 @@ function createMap(data, error) {
     .append("g")
     .attr("class", "legend-item")
     .attr("transform", function (d, i) {
-      const y = (i % itemsPerRow) * (size + leggendPadding);
-      const x = Math.floor(i / itemsPerRow) * (width / rows) + leggendPadding;
+      const y = (i % itemsPerRow) * (legendRectSize + leggendPadding);
+      const x =
+        Math.floor(i / itemsPerRow) * (treemapWidth / legendRows) +
+        leggendPadding;
       return `translate(${x}, ${y})`;
     });
 
   legend
     .append("rect")
-    .attr("width", size)
-    .attr("height", size)
+    .attr("width", legendRectSize)
+    .attr("height", legendRectSize)
     .attr("fill", function (d, i) {
       return color(d.name);
     });
@@ -105,8 +104,22 @@ function createMap(data, error) {
     .text(function (d) {
       return d.name;
     })
-    .attr("x", leggendPadding + size)
-    .attr("y", 0.8 * size);
+    .attr("x", leggendPadding + legendRectSize)
+    .attr("y", 0.8 * legendRectSize)
+    .call(wrapLegendText);
+
+  function wrapLegendText(text) {
+    text.each(function () {
+      const text = d3.select(this);
+      const nodeWidth =
+        treemapWidth / legendRows - legendRectSize - 2 * leggendPadding;
+      const realWidth = text.node().getComputedTextLength();
+
+      if (realWidth > nodeWidth) {
+        text.style("font-size", (nodeWidth / realWidth) * 16);
+      }
+    });
+  }
 
   // give data to this cluster layout:
   const root = d3.hierarchy(data).sum(function (d) {
@@ -114,7 +127,9 @@ function createMap(data, error) {
   }); // size of each leave is given in the 'value' field in input data
 
   // d3.treemap computes the position of each element of the hierarchy and calls it
-  d3.treemap().size([width, height]).padding(treemapPadding)(root);
+  d3.treemap().size([treemapWidth, TreemapHeight]).padding(treemapPadding)(
+    root
+  );
 
   // define the leaves
   const leave = svgTreemap
