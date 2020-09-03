@@ -67,11 +67,10 @@ function createMap(data, error) {
   // console.log(data.children);
 
   // legend
-  let rows = 3;
+  let rows = 5;
 
   const itemsPerRow = Math.ceil(data.children.length / rows);
   const legendHeight = itemsPerRow * (size + leggendPadding);
-  // console.log(Math.ceil(data.children.length / rows));
 
   // append svg for legend to body of page
   const svgLegend = d3
@@ -88,20 +87,9 @@ function createMap(data, error) {
     .append("g")
     .attr("class", "legend-item")
     .attr("transform", function (d, i) {
-      console.log(Math.floor(i / itemsPerRow));
       const y = (i % itemsPerRow) * (size + leggendPadding);
-      const x = () => {
-        if (itemsPerRow / i > 1) {
-          return leggendPadding;
-        }
-        if (1 >= itemsPerRow / i && itemsPerRow / i > 0.5) {
-          return width / rows;
-        }
-        if (itemsPerRow / i <= 0.5) {
-          return (width / rows) * 2;
-        }
-      };
-      return "translate(" + x() + ", " + y + ")";
+      const x = Math.floor(i / itemsPerRow) * (width / rows) + leggendPadding;
+      return `translate(${x}, ${y})`;
     });
 
   legend
@@ -110,25 +98,15 @@ function createMap(data, error) {
     .attr("height", size)
     .attr("fill", function (d, i) {
       return color(d.name);
-    })
-    // .attr("x", leggendPadding)
-    // .attr("y", (d, i) => i * (size + 5))
-    .attr("this", function (d, i) {
-      // console.log(d.name);
     });
 
-  // svgLegend
-  //   .selectAll("text")
-  //   .data(data.children)
-  //   .enter()
-  //   .append("text")
-  //   .text(function (d) {
-  //     return d.name;
-  //   })
-  //   .attr("x", leggendPadding + size * 1.2)
-  //   .attr("y", (d, i) => i * (size + 5) + size / 2)
-  //   .attr("text-anchor", "left")
-  //   .style("alignment-baseline", "middle");
+  legend
+    .append("text")
+    .text(function (d) {
+      return d.name;
+    })
+    .attr("x", leggendPadding + size)
+    .attr("y", 0.8 * size);
 
   // give data to this cluster layout:
   const root = d3.hierarchy(data).sum(function (d) {
