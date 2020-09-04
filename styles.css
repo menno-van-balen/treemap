@@ -68,9 +68,3 @@ a:hover {
     overflow-x: scroll;
   }
 }
-
-/* @media (max-height: 755px) {
-  .map-container {
-    overflow-y: scroll;
-  }
-} */
