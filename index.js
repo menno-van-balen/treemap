@@ -1,7 +1,7 @@
 // set dimensions and margins of the graph and treemap padding
 // let margin = { top: 10, right: 10, bottom: 10, left: 10 };
 let treemapWidth = 1000;
-let TreemapHeight = 800;
+let TreemapHeight = 750;
 let treemapPadding = 2;
 
 // set dimensions and margins of legend
@@ -60,17 +60,17 @@ function getData(url = kickStarterUrl) {
   d3.json(url).then(createMap);
   if (url == kickStarterUrl) {
     document.getElementById("title").textContent = "Kickstarter Pledges";
-    document.getElementById("discription").textContent =
+    document.getElementById("description").textContent =
       "Top 100 Most Pledged Kickstarter Campaigns Grouped By Category";
   }
   if (url == movieUrl) {
     document.getElementById("title").textContent = "Movies Sales";
-    document.getElementById("discription").textContent =
+    document.getElementById("description").textContent =
       "Top 100 Highest Grossing Movies Grouped By Genre";
   }
   if (url == videogameUrl) {
     document.getElementById("title").textContent = "Videogame Sales";
-    document.getElementById("discription").textContent =
+    document.getElementById("description").textContent =
       "Top 100 Most Sold Video Games Grouped by Platform";
   }
 }
@@ -100,7 +100,7 @@ function createMap(data, error) {
     .data(data.children)
     .enter()
     .append("g")
-    .attr("class", "legend-item")
+    .attr("class", "item-container")
     .attr("transform", function (d, i) {
       const y =
         legendPadding + (i % itemsPerColumn) * (legendRectSize + legendPadding);
@@ -112,6 +112,7 @@ function createMap(data, error) {
 
   legend
     .append("rect")
+    .attr("class", "legend-item")
     .attr("width", legendRectSize)
     .attr("height", legendRectSize)
     .attr("fill", function (d, i) {

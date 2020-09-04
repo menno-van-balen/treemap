@@ -61,3 +61,16 @@ a:hover {
   font-weight: bolder;
   cursor: pointer;
 }
+
+@media (max-width: 1024px) {
+  .legend-container,
+  .map-container {
+    overflow-x: scroll;
+  }
+}
+
+/* @media (max-height: 755px) {
+  .map-container {
+    overflow-y: scroll;
+  }
+} */
