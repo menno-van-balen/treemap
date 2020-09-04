@@ -5,14 +5,14 @@ let TreemapHeight = 800;
 let treemapPadding = 2;
 
 // set dimensions and margins of legend
-let legendRows = 7;
+let legendColumns = 7;
 let legendRectSize = 20;
 
 // data
 const kickStarterUrl =
   "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json";
 
-const moviesUrl =
+const movieUrl =
   "https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/movie-data.json";
 
 const videogameUrl =
@@ -63,7 +63,7 @@ function getData(url = kickStarterUrl) {
     document.getElementById("discription").textContent =
       "Top 100 Most Pledged Kickstarter Campaigns Grouped By Category";
   }
-  if (url == moviesUrl) {
+  if (url == movieUrl) {
     document.getElementById("title").textContent = "Movies Sales";
     document.getElementById("discription").textContent =
       "Top 100 Highest Grossing Movies Grouped By Genre";
@@ -81,9 +81,10 @@ function createMap(data, error) {
   d3.selectAll("svg").remove();
 
   // legend
-  const leggendPadding = legendRectSize / 4;
-  const itemsPerRow = Math.ceil(data.children.length / legendRows);
-  const legendHeight = itemsPerRow * (legendRectSize + leggendPadding);
+  const legendPadding = legendRectSize / 4;
+  const itemsPerColumn = Math.ceil(data.children.length / legendColumns);
+  const legendHeight =
+    legendPadding + itemsPerColumn * (legendRectSize + legendPadding);
 
   // append svg for legend to body of page
   const svgLegend = d3
@@ -101,10 +102,11 @@ function createMap(data, error) {
     .append("g")
     .attr("class", "legend-item")
     .attr("transform", function (d, i) {
-      const y = (i % itemsPerRow) * (legendRectSize + leggendPadding);
+      const y =
+        legendPadding + (i % itemsPerColumn) * (legendRectSize + legendPadding);
       const x =
-        Math.floor(i / itemsPerRow) * (treemapWidth / legendRows) +
-        leggendPadding;
+        Math.floor(i / itemsPerColumn) * (treemapWidth / legendColumns) +
+        legendPadding;
       return `translate(${x}, ${y})`;
     });
 
@@ -121,15 +123,15 @@ function createMap(data, error) {
     .text(function (d) {
       return d.name;
     })
-    .attr("x", leggendPadding + legendRectSize)
+    .attr("x", legendPadding + legendRectSize)
     .attr("y", 0.8 * legendRectSize)
-    .call(wrapLegendText);
+    .call(setFontSize);
 
-  function wrapLegendText(text) {
+  function setFontSize(text) {
     text.each(function () {
       const text = d3.select(this);
       const nodeWidth =
-        treemapWidth / legendRows - legendRectSize - 2 * leggendPadding;
+        treemapWidth / legendColumns - legendRectSize - 2 * legendPadding;
       const realWidth = text.node().getComputedTextLength();
 
       if (realWidth > nodeWidth) {
@@ -142,6 +144,7 @@ function createMap(data, error) {
   const svgTreemap = d3
     .select(".map-container")
     .append("svg")
+    .attr("id", "treemap")
     .attr("width", treemapWidth)
     .attr("height", TreemapHeight);
 
@@ -172,8 +175,8 @@ function createMap(data, error) {
     });
 
   function updateTooltip(d, i) {
-    const mouseX = event.pageX;
-    const mouseY = event.pageY;
+    const cursorX = event.pageX;
+    const cursorY = event.pageY;
     tooltip.transition().duration(300).style("opacity", 0.9);
     tooltip.attr("data-value", i.data.value);
     tooltip
@@ -187,8 +190,8 @@ function createMap(data, error) {
           "Value: " +
           i.data.value
       )
-      .style("top", mouseY - 60 + "px")
-      .style("left", mouseX + 10 + "px");
+      .style("top", cursorY - 60 + "px")
+      .style("left", cursorX + 10 + "px");
   }
 
   // create the leaves

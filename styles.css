@@ -1,6 +1,28 @@
 body {
   margin: 0;
   padding: 0;
+  text-align: center;
+  background: content-box
+    radial-gradient(rgb(201, 201, 201), rgb(105, 105, 105));
+}
+
+button {
+  background-color: rgb(199, 199, 199);
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: lightblue;
+}
+
+svg {
+  border: 2px solid black;
+  background-color: rgb(199, 199, 199);
+}
+
+.navbar {
+  margin: 20px;
 }
 
 g {
@@ -23,5 +45,19 @@ tspan {
 }
 
 .leave:hover {
+  cursor: pointer;
+}
+
+.credits {
+  letter-spacing: 3px;
+}
+
+a {
+  color: aliceblue;
+  text-decoration: none;
+}
+
+a:hover {
+  font-weight: bolder;
   cursor: pointer;
 }
